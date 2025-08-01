@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkSync - Project & Task Management</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Sortable.js for drag and drop -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <!-- Custom CSS -->
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="bi bi-kanban me-2"></i>WorkSync
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" data-page="dashboard">
+                            <i class="bi bi-house me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="projects">
+                            <i class="bi bi-folder me-1"></i>Projects
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="tasks">
+                            <i class="bi bi-list-task me-1"></i>Tasks
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="kanban">
+                            <i class="bi bi-kanban me-1"></i>Kanban
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="navbar-nav ms-auto">
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-bell me-1"></i>
+                            <span class="badge bg-danger" id="notificationCount">0</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" id="notificationDropdown">
+                            <li><h6 class="dropdown-header">Notifications</h6></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="noNotifications">No new notifications</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle me-1"></i>
+                            <span id="userName">Demo User</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#" data-page="profile">
+                                <i class="bi bi-person me-2"></i>Profile
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" id="toggleTheme">
+                                <i class="bi bi-moon me-2"></i>Toggle Theme
+                            </a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container-fluid mt-5 pt-3">
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="text-center d-none">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+        <!-- App Pages -->
+        <div id="appPages">
+            <!-- Dashboard Page -->
+            <div id="dashboardPage" class="page-content">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h1 class="h3 mb-0">Dashboard</h1>
+                        <p class="text-muted">Welcome back! Here's an overview of your projects and tasks.</p>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h4 class="card-title" id="totalProjects">0</h4>
+                                        <p class="card-text">Total Projects</p>
+                                    </div>
+                                    <i class="bi bi-folder fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card bg-success text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h4 class="card-title" id="completedTasks">0</h4>
+                                        <p class="card-text">Completed Tasks</p>
+                                    </div>
+                                    <i class="bi bi-check-circle fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card bg-warning text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h4 class="card-title" id="pendingTasks">0</h4>
+                                        <p class="card-text">Pending Tasks</p>
+                                    </div>
+                                    <i class="bi bi-clock fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card bg-danger text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h4 class="card-title" id="overdueTasks">0</h4>
+                                        <p class="card-text">Overdue Tasks</p>
+                                    </div>
+                                    <i class="bi bi-exclamation-triangle fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Task Status Distribution</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="taskStatusChart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Weekly Progress</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="weeklyProgressChart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Projects and Tasks -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">Recent Projects</h5>
+                                <a href="#" data-page="projects" class="btn btn-sm btn-outline-primary">View All</a>
+                            </div>
+                            <div class="card-body">
+                                <div id="recentProjectsList">
+                                    <p class="text-muted text-center">No projects yet</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">Recent Tasks</h5>
+                                <a href="#" data-page="tasks" class="btn btn-sm btn-outline-primary">View All</a>
+                            </div>
+                            <div class="card-body">
+                                <div id="recentTasksList">
+                                    <p class="text-muted text-center">No tasks yet</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projects Page -->
+            <div id="projectsPage" class="page-content d-none">
+                <div class="row mb-4">
+                    <div class="col-12 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1 class="h3 mb-0">Projects</h1>
+                            <p class="text-muted">Manage your projects and collaborate with team members.</p>
+                        </div>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createProjectModal">
+                            <i class="bi bi-plus me-2"></i>New Project
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Search and Filter -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" id="projectSearch" placeholder="Search projects...">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="projectStatusFilter">
+                            <option value="">All Status</option>
+                            <option value="ACTIVE">Active</option>
+                            <option value="COMPLETED">Completed</option>
+                            <option value="ON_HOLD">On Hold</option>
+                            <option value="CANCELLED">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="projectSortBy">
+                            <option value="createdAt">Created Date</option>
+                            <option value="name">Name</option>
+                            <option value="progress">Progress</option>
+                            <option value="updatedAt">Last Updated</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Projects Grid -->
+                <div class="row" id="projectsGrid">
+                    <!-- Projects will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Tasks Page -->
+            <div id="tasksPage" class="page-content d-none">
+                <div class="row mb-4">
+                    <div class="col-12 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1 class="h3 mb-0">Tasks</h1>
+                            <p class="text-muted">Track and manage your tasks across all projects.</p>
+                        </div>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createTaskModal">
+                            <i class="bi bi-plus me-2"></i>New Task
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Search and Filter -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" id="taskSearch" placeholder="Search tasks...">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="taskStatusFilter">
+                            <option value="">All Status</option>
+                            <option value="NOT_STARTED">Not Started</option>
+                            <option value="IN_PROGRESS">In Progress</option>
+                            <option value="COMPLETED">Completed</option>
+                            <option value="ON_HOLD">On Hold</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="taskPriorityFilter">
+                            <option value="">All Priority</option>
+                            <option value="LOW">Low</option>
+                            <option value="MEDIUM">Medium</option>
+                            <option value="HIGH">High</option>
+                            <option value="URGENT">Urgent</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="taskProjectFilter">
+                            <option value="">All Projects</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="taskSortBy">
+                            <option value="dueDate">Due Date</option>
+                            <option value="priority">Priority</option>
+                            <option value="createdAt">Created Date</option>
+                            <option value="title">Title</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Tasks Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="tasksTable">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Project</th>
+                                        <th>Status</th>
+                                        <th>Priority</th>
+                                        <th>Assigned To</th>
+                                        <th>Due Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tasksTableBody">
+                                    <!-- Tasks will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kanban Page -->
+            <div id="kanbanPage" class="page-content d-none">
+                <div class="row mb-4">
+                    <div class="col-12 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1 class="h3 mb-0">Kanban Board</h1>
+                            <p class="text-muted">Drag and drop tasks to manage workflow.</p>
+                        </div>
+                        <div>
+                            <select class="form-select d-inline-block w-auto me-2" id="kanbanProjectFilter">
+                                <option value="">All Projects</option>
+                            </select>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createTaskModal">
+                                <i class="bi bi-plus me-2"></i>New Task
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kanban Board -->
+                <div class="row" id="kanbanBoard">
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-header bg-secondary text-white">
+                                <h6 class="mb-0">To Do</h6>
+                            </div>
+                            <div class="card-body kanban-column" data-status="NOT_STARTED">
+                                <div class="kanban-tasks" id="todoTasks">
+                                    <!-- Tasks will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h6 class="mb-0">In Progress</h6>
+                            </div>
+                            <div class="card-body kanban-column" data-status="IN_PROGRESS">
+                                <div class="kanban-tasks" id="inProgressTasks">
+                                    <!-- Tasks will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-header bg-warning text-white">
+                                <h6 class="mb-0">On Hold</h6>
+                            </div>
+                            <div class="card-body kanban-column" data-status="ON_HOLD">
+                                <div class="kanban-tasks" id="onHoldTasks">
+                                    <!-- Tasks will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-header bg-success text-white">
+                                <h6 class="mb-0">Done</h6>
+                            </div>
+                            <div class="card-body kanban-column" data-status="COMPLETED">
+                                <div class="kanban-tasks" id="doneTasks">
+                                    <!-- Tasks will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <!-- Create Project Modal -->
+    <div class="modal fade" id="createProjectModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create New Project</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createProjectForm">
+                        <div class="mb-3">
+                            <label for="projectName" class="form-label">Project Name</label>
+                            <input type="text" class="form-control" id="projectName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="projectDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="projectDescription" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="projectTags" class="form-label">Tags (comma separated)</label>
+                            <input type="text" class="form-control" id="projectTags" placeholder="tag1, tag2, tag3">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="projectStartDate" class="form-label">Start Date</label>
+                                    <input type="date" class="form-control" id="projectStartDate">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="projectEndDate" class="form-label">End Date</label>
+                                    <input type="date" class="form-control" id="projectEndDate">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveProjectBtn">Create Project</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Task Modal -->
+    <div class="modal fade" id="createTaskModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create New Task</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createTaskForm">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label for="taskTitle" class="form-label">Task Title</label>
+                                    <input type="text" class="form-control" id="taskTitle" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="taskProject" class="form-label">Project</label>
+                                    <select class="form-select" id="taskProject" required>
+                                        <option value="">Select Project</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="taskDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="taskDescription" rows="3"></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="taskPriority" class="form-label">Priority</label>
+                                    <select class="form-select" id="taskPriority">
+                                        <option value="MEDIUM">Medium</option>
+                                        <option value="LOW">Low</option>
+                                        <option value="HIGH">High</option>
+                                        <option value="URGENT">Urgent</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="taskStatus" class="form-label">Status</label>
+                                    <select class="form-select" id="taskStatus">
+                                        <option value="NOT_STARTED">Not Started</option>
+                                        <option value="IN_PROGRESS">In Progress</option>
+                                        <option value="ON_HOLD">On Hold</option>
+                                        <option value="COMPLETED">Completed</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="taskDueDate" class="form-label">Due Date</label>
+                                    <input type="date" class="form-control" id="taskDueDate">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveTaskBtn">Create Task</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="js/app.js"></script>
+    <script src="js/projects.js"></script>
+    <script src="js/tasks.js"></script>
+    <script src="js/kanban.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html> 

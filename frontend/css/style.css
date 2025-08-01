@@ -1,0 +1,494 @@
+/* Custom CSS for WorkSync */
+
+:root {
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+    --success-color: #198754;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --info-color: #0dcaf0;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+    --body-bg: #ffffff;
+    --body-color: #212529;
+    --card-bg: #ffffff;
+    --border-color: #dee2e6;
+    --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --shadow-lg: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="dark"] {
+    --primary-color: #3d8bfd;
+    --secondary-color: #6c757d;
+    --success-color: #2ea043;
+    --warning-color: #d97706;
+    --danger-color: #f85149;
+    --info-color: #1f6feb;
+    --light-color: #212529;
+    --dark-color: #f8f9fa;
+    --body-bg: #0d1117;
+    --body-color: #c9d1d9;
+    --card-bg: #161b22;
+    --border-color: #30363d;
+    --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 0.5rem 1rem rgba(0, 0, 0, 0.4);
+}
+
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+body {
+    background-color: var(--body-bg);
+    color: var(--body-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Navigation */
+.navbar {
+    box-shadow: var(--shadow);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+/* Cards */
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Buttons */
+.btn {
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    filter: brightness(1.1);
+}
+
+/* Forms */
+.form-control, .form-select {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--body-color);
+    border-radius: 0.5rem;
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: var(--card-bg);
+    border-color: var(--primary-color);
+    color: var(--body-color);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.form-label {
+    font-weight: 500;
+    color: var(--body-color);
+}
+
+/* Tables */
+.table {
+    background-color: var(--card-bg);
+    color: var(--body-color);
+}
+
+.table th {
+    background-color: var(--light-color);
+    border-bottom: 2px solid var(--border-color);
+    font-weight: 600;
+}
+
+.table td {
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+
+.table-hover tbody tr:hover {
+    background-color: var(--light-color);
+}
+
+/* Status Badges */
+.badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.375rem;
+}
+
+.badge.bg-success {
+    background-color: var(--success-color) !important;
+}
+
+.badge.bg-warning {
+    background-color: var(--warning-color) !important;
+    color: var(--dark-color) !important;
+}
+
+.badge.bg-danger {
+    background-color: var(--danger-color) !important;
+}
+
+.badge.bg-info {
+    background-color: var(--info-color) !important;
+}
+
+.badge.bg-secondary {
+    background-color: var(--secondary-color) !important;
+}
+
+/* Priority Colors */
+.priority-low {
+    color: var(--success-color);
+}
+
+.priority-medium {
+    color: var(--warning-color);
+}
+
+.priority-high {
+    color: var(--danger-color);
+}
+
+.priority-urgent {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+/* Kanban Board */
+.kanban-column {
+    min-height: 400px;
+    background-color: var(--light-color);
+    border-radius: 0.5rem;
+    padding: 1rem;
+}
+
+.kanban-tasks {
+    min-height: 300px;
+}
+
+.kanban-task {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    cursor: grab;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow);
+}
+
+.kanban-task:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.kanban-task:active {
+    cursor: grabbing;
+}
+
+.kanban-task.overdue {
+    border-left: 4px solid var(--danger-color);
+}
+
+.kanban-task.high-priority {
+    border-left: 4px solid var(--danger-color);
+}
+
+.kanban-task.medium-priority {
+    border-left: 4px solid var(--warning-color);
+}
+
+.kanban-task.low-priority {
+    border-left: 4px solid var(--success-color);
+}
+
+/* Project Cards */
+.project-card {
+    height: 100%;
+    transition: all 0.3s ease;
+}
+
+.project-card .card-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.project-card .progress {
+    height: 0.5rem;
+    border-radius: 0.25rem;
+}
+
+.project-card .project-tags {
+    margin-top: auto;
+}
+
+.project-tag {
+    display: inline-block;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    margin: 0.125rem;
+}
+
+/* Task Items */
+.task-item {
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: var(--card-bg);
+    transition: all 0.2s ease;
+}
+
+.task-item:hover {
+    box-shadow: var(--shadow);
+    transform: translateY(-1px);
+}
+
+.task-item.overdue {
+    border-left: 4px solid var(--danger-color);
+}
+
+.task-item.completed {
+    opacity: 0.7;
+    background-color: var(--light-color);
+}
+
+/* Charts */
+.chart-container {
+    position: relative;
+    height: 300px;
+}
+
+/* Loading Spinner */
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Modal */
+.modal-content {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-footer {
+    border-top: 1px solid var(--border-color);
+}
+
+/* Dropdown */
+.dropdown-menu {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-lg);
+}
+
+.dropdown-item {
+    color: var(--body-color);
+}
+
+.dropdown-item:hover {
+    background-color: var(--light-color);
+    color: var(--body-color);
+}
+
+.dropdown-header {
+    color: var(--secondary-color);
+    font-weight: 600;
+}
+
+/* Notifications */
+.notification-item {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.2s ease;
+}
+
+.notification-item:hover {
+    background-color: var(--light-color);
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container-fluid {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .kanban-column {
+        margin-bottom: 1rem;
+    }
+    
+    .project-card {
+        margin-bottom: 1rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+    
+    .btn {
+        font-size: 0.875rem;
+        padding: 0.375rem 0.75rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar-brand {
+        font-size: 1.25rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+    
+    .kanban-task {
+        padding: 0.75rem;
+    }
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-in {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+/* Utility Classes */
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.border-left-success {
+    border-left: 4px solid var(--success-color);
+}
+
+.border-left-warning {
+    border-left: 4px solid var(--warning-color);
+}
+
+.border-left-danger {
+    border-left: 4px solid var(--danger-color);
+}
+
+.border-left-info {
+    border-left: 4px solid var(--info-color);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--light-color);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--secondary-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--dark-color);
+}
+
+/* Focus Styles */
+.btn:focus,
+.form-control:focus,
+.form-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Print Styles */
+@media print {
+    .navbar,
+    .btn,
+    .modal,
+    .dropdown-menu {
+        display: none !important;
+    }
+    
+    .card {
+        border: 1px solid #000;
+        box-shadow: none;
+    }
+    
+    body {
+        background: white;
+        color: black;
+    }
+} 
