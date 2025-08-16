@@ -95,6 +95,42 @@ body {
     filter: brightness(1.1);
 }
 
+/* Authentication Forms */
+.auth-form {
+    transition: opacity 0.3s ease;
+}
+
+.auth-form.d-none {
+    opacity: 0;
+}
+
+.auth-form:not(.d-none) {
+    opacity: 1;
+}
+
+.auth-form .form-control {
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border-color);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.auth-form .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.auth-form .btn {
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    border-radius: 0.5rem;
+}
+
+.auth-form .alert {
+    border-radius: 0.5rem;
+    border: none;
+}
+
 /* Forms */
 .form-control, .form-select {
     background-color: var(--card-bg);
