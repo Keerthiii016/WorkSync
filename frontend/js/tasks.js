@@ -24,8 +24,23 @@ class TasksManager {
             this.createTask();
         });
 
+        // Reset modal when closed
+        const createTaskModal = document.getElementById('createTaskModal');
+        if (createTaskModal) {
+            createTaskModal.addEventListener('hidden.bs.modal', () => {
+                this.resetModal();
+            });
+        }
+
         // Setup filter event listeners
         this.setupFilterListeners();
+    }
+
+    resetModal() {
+        this.editingTaskId = null;
+        document.querySelector('#createTaskModal .modal-title').textContent = 'Create New Task';
+        document.getElementById('saveTaskBtn').textContent = 'Create Task';
+        document.getElementById('createTaskForm').reset();
     }
 
     setupFilterListeners() {
@@ -241,38 +256,74 @@ class TasksManager {
                 project = { id: numericProjectId || taskData.projectId, name: selectedText };
             }
             
-            // For demo purposes, create task locally
-            const newTask = {
-                id: Date.now(),
-                title: taskData.title,
-                description: taskData.description,
-                project: project,
-                status: taskData.status,
-                priority: taskData.priority,
-                assignedTo: { id: 1, name: 'Demo User' },
-                dueDate: taskData.dueDate || null,
-                createdAt: new Date().toISOString().split('T')[0]
-            };
+            if (this.editingTaskId) {
+                // Update existing task
+                const taskIndex = this.tasks.findIndex(t => t.id === this.editingTaskId);
+                if (taskIndex !== -1) {
+                    this.tasks[taskIndex] = {
+                        ...this.tasks[taskIndex],
+                        title: taskData.title,
+                        description: taskData.description,
+                        project: project,
+                        status: taskData.status,
+                        priority: taskData.priority,
+                        dueDate: taskData.dueDate || null
+                    };
+                    
+                    this.filteredTasks = [...this.tasks];
+                    this.renderTasks();
+                    
+                    // Reset editing state
+                    this.editingTaskId = null;
+                    
+                    // Close modal and reset form
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('createTaskModal'));
+                    modal.hide();
+                    form.reset();
+                    
+                    // Reset modal title and button
+                    document.querySelector('#createTaskModal .modal-title').textContent = 'Create New Task';
+                    document.getElementById('saveTaskBtn').textContent = 'Create Task';
+                    
+                    window.worksyncApp.showSuccess('Task updated successfully');
+                }
+            } else {
+                // Create new task
+                const newTask = {
+                    id: Date.now(),
+                    title: taskData.title,
+                    description: taskData.description,
+                    project: project,
+                    status: taskData.status,
+                    priority: taskData.priority,
+                    assignedTo: { id: 1, name: 'Demo User' },
+                    dueDate: taskData.dueDate || null,
+                    createdAt: new Date().toISOString().split('T')[0]
+                };
 
-            this.tasks.unshift(newTask);
-            this.filteredTasks = [...this.tasks];
-            this.renderTasks();
+                this.tasks.unshift(newTask);
+                this.filteredTasks = [...this.tasks];
+                this.renderTasks();
 
-            // Close modal and reset form
-            const modal = bootstrap.Modal.getInstance(document.getElementById('createTaskModal'));
-            modal.hide();
-            form.reset();
+                // Close modal and reset form
+                const modal = bootstrap.Modal.getInstance(document.getElementById('createTaskModal'));
+                modal.hide();
+                form.reset();
 
-            window.worksyncApp.showSuccess('Task created successfully');
+                window.worksyncApp.showSuccess('Task created successfully');
+            }
         } catch (error) {
-            console.error('Failed to create task:', error);
-            window.worksyncApp.showError('Failed to create task');
+            console.error('Failed to save task:', error);
+            window.worksyncApp.showError('Failed to save task');
         }
     }
 
     editTask(taskId) {
         const task = this.tasks.find(t => t.id === taskId);
         if (!task) return;
+
+        // Store the task ID being edited
+        this.editingTaskId = taskId;
 
         // Populate form with task data
         document.getElementById('taskTitle').value = task.title;
