@@ -58,7 +58,9 @@ class WorkSyncApp {
         const projectSearch = document.getElementById('projectSearch');
         if (projectSearch) {
             projectSearch.addEventListener('input', this.debounce(() => {
-                this.filterProjects();
+                if (window.projectsManager) {
+                    window.projectsManager.filterProjects();
+                }
             }, 300));
         }
 
@@ -66,7 +68,9 @@ class WorkSyncApp {
         const taskSearch = document.getElementById('taskSearch');
         if (taskSearch) {
             taskSearch.addEventListener('input', this.debounce(() => {
-                this.filterTasks();
+                if (window.tasksManager) {
+                    window.tasksManager.filterTasks();
+                }
             }, 300));
         }
 
@@ -77,13 +81,46 @@ class WorkSyncApp {
             if (element) {
                 element.addEventListener('change', () => {
                     if (id.includes('project')) {
-                        this.filterProjects();
+                        if (window.projectsManager) {
+                            window.projectsManager.filterProjects();
+                        }
                     } else {
-                        this.filterTasks();
+                        if (window.tasksManager) {
+                            window.tasksManager.filterTasks();
+                        }
                     }
                 });
             }
         });
+    }
+
+    // Setup filters after managers are initialized
+    setupFiltersAfterManagers() {
+        setTimeout(() => {
+            // Task search
+            const taskSearch = document.getElementById('taskSearch');
+            if (taskSearch && !taskSearch.hasAttribute('data-filter-setup')) {
+                taskSearch.setAttribute('data-filter-setup', 'true');
+                taskSearch.addEventListener('input', this.debounce(() => {
+                    if (window.tasksManager) {
+                        window.tasksManager.filterTasks();
+                    }
+                }, 300));
+            }
+
+            // Task filters
+            ['taskStatusFilter', 'taskPriorityFilter', 'taskProjectFilter', 'taskSortBy'].forEach(id => {
+                const element = document.getElementById(id);
+                if (element && !element.hasAttribute('data-filter-setup')) {
+                    element.setAttribute('data-filter-setup', 'true');
+                    element.addEventListener('change', () => {
+                        if (window.tasksManager) {
+                            window.tasksManager.filterTasks();
+                        }
+                    });
+                }
+            });
+        }, 100);
     }
 
     navigateToPage(page) {
@@ -119,6 +156,7 @@ class WorkSyncApp {
                 break;
             case 'tasks':
                 this.loadTasks();
+                this.setupFiltersAfterManagers();
                 break;
             case 'kanban':
                 this.loadKanban();

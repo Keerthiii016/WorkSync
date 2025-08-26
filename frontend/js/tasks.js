@@ -23,6 +23,29 @@ class TasksManager {
             e.preventDefault();
             this.createTask();
         });
+
+        // Setup filter event listeners
+        this.setupFilterListeners();
+    }
+
+    setupFilterListeners() {
+        // Task search
+        const taskSearch = document.getElementById('taskSearch');
+        if (taskSearch) {
+            taskSearch.addEventListener('input', () => {
+                this.filterTasks();
+            });
+        }
+
+        // Task filters
+        ['taskStatusFilter', 'taskPriorityFilter', 'taskProjectFilter', 'taskSortBy'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('change', () => {
+                    this.filterTasks();
+                });
+            }
+        });
     }
 
     async loadTasks() {
