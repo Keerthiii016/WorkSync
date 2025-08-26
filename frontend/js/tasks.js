@@ -209,15 +209,21 @@ class TasksManager {
         }
 
         try {
-            // Get project details
-            const project = window.projectsManager?.getProjectById(parseInt(taskData.projectId));
+            // Get project details (fall back to selected option text if lookup fails)
+            const numericProjectId = parseInt(taskData.projectId);
+            let project = window.projectsManager?.getProjectById(numericProjectId);
+            if (!project) {
+                const projectSelect = document.getElementById('taskProject');
+                const selectedText = projectSelect?.options[projectSelect.selectedIndex]?.textContent || 'Unknown Project';
+                project = { id: numericProjectId || taskData.projectId, name: selectedText };
+            }
             
             // For demo purposes, create task locally
             const newTask = {
                 id: Date.now(),
                 title: taskData.title,
                 description: taskData.description,
-                project: project || { id: taskData.projectId, name: 'Unknown Project' },
+                project: project,
                 status: taskData.status,
                 priority: taskData.priority,
                 assignedTo: { id: 1, name: 'Demo User' },

@@ -358,23 +358,40 @@ class ProjectsManager {
     updateProjectFilters() {
         // Update project filter dropdowns in other modules
         const projectFilters = ['taskProjectFilter', 'kanbanProjectFilter'];
-        
+
         projectFilters.forEach(filterId => {
             const filter = document.getElementById(filterId);
             if (filter) {
                 const currentValue = filter.value;
                 filter.innerHTML = '<option value="">All Projects</option>';
-                
+
                 this.projects.forEach(project => {
                     const option = document.createElement('option');
                     option.value = project.id;
                     option.textContent = project.name;
                     filter.appendChild(option);
                 });
-                
+
                 filter.value = currentValue;
             }
         });
+
+        // Update the create task modal project selector
+        const taskProjectSelect = document.getElementById('taskProject');
+        if (taskProjectSelect) {
+            const currentValue = taskProjectSelect.value;
+            taskProjectSelect.innerHTML = '<option value="">Select Project</option>';
+
+            this.projects.forEach(project => {
+                const option = document.createElement('option');
+                option.value = project.id;
+                option.textContent = project.name;
+                taskProjectSelect.appendChild(option);
+            });
+
+            // restore previously selected value if still present
+            taskProjectSelect.value = currentValue;
+        }
     }
 
     getStatusColor(status) {
