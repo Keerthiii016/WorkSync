@@ -23,6 +23,29 @@ class ProjectsManager {
             e.preventDefault();
             this.createProject();
         });
+
+        // Setup filter event listeners
+        this.setupFilterListeners();
+    }
+
+    setupFilterListeners() {
+        // Project search
+        const projectSearch = document.getElementById('projectSearch');
+        if (projectSearch) {
+            projectSearch.addEventListener('input', () => {
+                this.filterProjects();
+            });
+        }
+
+        // Project filters
+        ['projectStatusFilter', 'projectSortBy'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('change', () => {
+                    this.filterProjects();
+                });
+            }
+        });
     }
 
     async loadProjects() {
