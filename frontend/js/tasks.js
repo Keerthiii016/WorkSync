@@ -273,6 +273,11 @@ class TasksManager {
                     this.filteredTasks = [...this.tasks];
                     this.renderTasks();
                     
+                    // Update kanban board if available
+                    if (window.kanbanManager) {
+                        window.kanbanManager.updateFromTasksManager();
+                    }
+                    
                     // Reset editing state
                     this.editingTaskId = null;
                     
@@ -301,16 +306,21 @@ class TasksManager {
                     createdAt: new Date().toISOString().split('T')[0]
                 };
 
-                this.tasks.unshift(newTask);
-                this.filteredTasks = [...this.tasks];
-                this.renderTasks();
+                            this.tasks.unshift(newTask);
+            this.filteredTasks = [...this.tasks];
+            this.renderTasks();
 
-                // Close modal and reset form
-                const modal = bootstrap.Modal.getInstance(document.getElementById('createTaskModal'));
-                modal.hide();
-                form.reset();
+            // Update kanban board if available
+            if (window.kanbanManager) {
+                window.kanbanManager.updateFromTasksManager();
+            }
 
-                window.worksyncApp.showSuccess('Task created successfully');
+            // Close modal and reset form
+            const modal = bootstrap.Modal.getInstance(document.getElementById('createTaskModal'));
+            modal.hide();
+            form.reset();
+
+            window.worksyncApp.showSuccess('Task created successfully');
             }
         } catch (error) {
             console.error('Failed to save task:', error);
@@ -387,7 +397,7 @@ class TasksManager {
             
             const matchesStatus = !statusFilter || task.status === statusFilter;
             const matchesPriority = !priorityFilter || task.priority === priorityFilter;
-            const matchesProject = !projectFilter || task.project?.id === parseInt(projectFilter);
+            const matchesProject = !projectFilter || projectFilter === '' || task.project?.id === parseInt(projectFilter);
             
             return matchesSearch && matchesStatus && matchesPriority && matchesProject;
         });

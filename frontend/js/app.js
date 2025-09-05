@@ -158,7 +158,7 @@ class WorkSyncApp {
                 this.loadTasks();
                 this.setupFiltersAfterManagers();
                 break;
-            case 'kanban':
+            case 'workflow':
                 this.loadKanban();
                 break;
         }
@@ -517,8 +517,26 @@ class WorkSyncApp {
     }
 
     loadKanban() {
-        // Will be implemented in kanban.js
-        console.log('Loading kanban...');
+        // Initialize kanban manager if not already done
+        if (!window.kanbanManager) {
+            window.kanbanManager = new KanbanManager();
+        }
+        
+        // Always refresh the board to get latest tasks
+        if (window.kanbanManager) {
+            window.kanbanManager.refreshBoard();
+        }
+        
+        // Setup kanban filter event listeners
+        const kanbanProjectFilter = document.getElementById('kanbanProjectFilter');
+        if (kanbanProjectFilter && !kanbanProjectFilter.hasAttribute('data-filter-setup')) {
+            kanbanProjectFilter.setAttribute('data-filter-setup', 'true');
+            kanbanProjectFilter.addEventListener('change', () => {
+                if (window.kanbanManager) {
+                    window.kanbanManager.filterTasks();
+                }
+            });
+        }
     }
 
     filterProjects() {

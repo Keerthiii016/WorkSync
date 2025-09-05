@@ -3,6 +3,7 @@
 class KanbanManager {
     constructor() {
         this.tasks = [];
+        this.allTasks = []; // <--- Added master task list
         this.init();
     }
 
@@ -13,20 +14,14 @@ class KanbanManager {
     }
 
     setupEventListeners() {
-        // Project filter for kanban
-        document.getElementById('kanbanProjectFilter')?.addEventListener('change', () => {
-            this.filterTasks();
-        });
+        // Project filter for kanban - this will be set up by app.js when navigating to workflow page
+        // No need to set up here to avoid duplicate listeners
     }
 
     async loadTasks() {
         try {
-            // Get tasks from tasks manager if available
-            if (window.tasksManager) {
-                this.tasks = [...window.tasksManager.tasks];
-            } else {
-                // Fallback sample data
-                this.tasks = [
+            // Use sample data for now to ensure it loads quickly
+            this.allTasks = [ // <--- Set master task list
                     {
                         id: 1,
                         title: 'Design Homepage Layout',
@@ -90,8 +85,8 @@ class KanbanManager {
                         dueDate: '2024-02-15'
                     }
                 ];
-            }
 
+            this.tasks = [...this.allTasks]; // <--- Set display list from master
             this.renderKanbanBoard();
         } catch (error) {
             console.error('Failed to load kanban tasks:', error);
@@ -231,14 +226,19 @@ class KanbanManager {
 
     filterTasks() {
         const projectFilter = document.getElementById('kanbanProjectFilter')?.value;
+        console.log('Filtering tasks with project filter:', projectFilter);
         
-        if (!projectFilter) {
-            // Show all tasks
-            this.tasks = window.tasksManager ? [...window.tasksManager.tasks] : this.tasks;
+        // Always filter from master list (allTasks) or window.tasksManager if available
+        let currentTasks = window.tasksManager ? [...window.tasksManager.tasks] : this.allTasks;
+        
+        if (!projectFilter || projectFilter === '' || projectFilter === 'All Projects') {
+            // Show all tasks when "All Projects" is selected
+            this.tasks = [...currentTasks];
+            console.log('Showing all tasks:', this.tasks.length);
         } else {
             // Filter by project
-            this.tasks = (window.tasksManager ? window.tasksManager.tasks : this.tasks)
-                .filter(task => task.project?.id === parseInt(projectFilter));
+            this.tasks = currentTasks.filter(task => task.project?.id === parseInt(projectFilter));
+            console.log('Filtered tasks for project', projectFilter, ':', this.tasks.length);
         }
 
         this.renderKanbanBoard();
@@ -329,6 +329,9 @@ class KanbanManager {
                 window.tasksManager.renderTasks();
             }
 
+            // Also remove from master task list
+            this.allTasks = this.allTasks.filter(t => t.id !== taskId);
+
             this.renderKanbanBoard();
             window.worksyncApp.showSuccess('Task deleted successfully');
         } catch (error) {
@@ -368,15 +371,23 @@ class KanbanManager {
     }
 
     refreshBoard() {
-        this.loadTasks();
+        // Refresh tasks from tasks manager if available
+        if (window.tasksManager && window.tasksManager.tasks.length > 0) {
+            this.allTasks = [...window.tasksManager.tasks]; // <--- Sync master list
+            this.tasks = [...this.allTasks]; // <--- Sync display list
+            console.log('Refreshed from tasks manager:', this.tasks.length, 'tasks');
+        }
+        this.filterTasks(); // Re-apply current filter and render
+    }
+
+    // Method to be called when tasks are updated
+    updateFromTasksManager() {
+        if (window.tasksManager) {
+            this.allTasks = [...window.tasksManager.tasks]; // <--- Sync master list
+            this.filterTasks(); // Re-apply current filter
+        }
     }
 }
 
-// Initialize kanban manager
-let kanbanManager;
-document.addEventListener('DOMContentLoaded', () => {
-    kanbanManager = new KanbanManager();
-});
-
 // Export for global access
-window.kanbanManager = kanbanManager; 
+window.KanbanManager = KanbanManager;
