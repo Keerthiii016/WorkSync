@@ -326,6 +326,9 @@ class TasksManager {
             console.error('Failed to save task:', error);
             window.worksyncApp.showError('Failed to save task');
         }
+        if (window.kanbanManager) {
+            window.kanbanManager.refreshBoard();
+        }
     }
 
     editTask(taskId) {
@@ -485,7 +488,8 @@ class TasksManager {
 let tasksManager;
 document.addEventListener('DOMContentLoaded', () => {
     tasksManager = new TasksManager();
+    // Expose globally after initialization so other modules (e.g., kanban) can access it
+    window.tasksManager = tasksManager;
 });
 
 // Export for global access
-window.tasksManager = tasksManager; 
