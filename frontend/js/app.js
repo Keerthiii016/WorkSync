@@ -304,6 +304,12 @@ class WorkSyncApp {
         const ctx = document.getElementById('taskStatusChart');
         if (!ctx) return;
 
+        // Destroy previous instance if exists to allow clean redraws
+        if (this._taskStatusChart) {
+            try { this._taskStatusChart.destroy(); } catch (e) {}
+            this._taskStatusChart = null;
+        }
+
         const statusCounts = {
             'NOT_STARTED': 0,
             'IN_PROGRESS': 0,
@@ -315,7 +321,7 @@ class WorkSyncApp {
             statusCounts[task.status] = (statusCounts[task.status] || 0) + 1;
         });
 
-        new Chart(ctx, {
+        this._taskStatusChart = new Chart(ctx, {
             type: 'doughnut',
             data: {
                 labels: ['Not Started', 'In Progress', 'Completed', 'On Hold'],
@@ -345,6 +351,12 @@ class WorkSyncApp {
         const ctx = document.getElementById('weeklyProgressChart');
         if (!ctx) return;
 
+        // Destroy previous instance if exists
+        if (this._weeklyProgressChart) {
+            try { this._weeklyProgressChart.destroy(); } catch (e) {}
+            this._weeklyProgressChart = null;
+        }
+
         const last7Days = Array.from({length: 7}, (_, i) => {
             const date = new Date();
             date.setDate(date.getDate() - i);
@@ -358,7 +370,7 @@ class WorkSyncApp {
             ).length;
         });
 
-        new Chart(ctx, {
+        this._weeklyProgressChart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: last7Days.map(date => new Date(date).toLocaleDateString()),
