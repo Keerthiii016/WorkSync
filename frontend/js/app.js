@@ -167,8 +167,16 @@ class WorkSyncApp {
     async loadDashboard() {
         try {
             this.showLoading(true);
-            
-            // For demo purposes, create some sample data
+
+            // Prefer live data from managers; fall back to demo data if unavailable
+            const liveProjects = (window.projectsManager && window.projectsManager.projects?.length)
+                ? [...window.projectsManager.projects]
+                : null;
+            const liveTasks = (window.tasksManager && window.tasksManager.tasks?.length)
+                ? [...window.tasksManager.tasks]
+                : null;
+
+            // Demo data fallback
             const sampleProjects = [
                 {
                     id: 1,
@@ -241,9 +249,12 @@ class WorkSyncApp {
                 }
             ];
 
-            this.updateDashboardStats(sampleProjects, sampleTasks);
-            this.updateDashboardCharts(sampleTasks);
-            this.updateRecentItems(sampleProjects, sampleTasks);
+            const projects = liveProjects || sampleProjects;
+            const tasks = liveTasks || sampleTasks;
+
+            this.updateDashboardStats(projects, tasks);
+            this.updateDashboardCharts(tasks);
+            this.updateRecentItems(projects, tasks);
             
         } catch (error) {
             console.error('Failed to load dashboard:', error);
@@ -251,6 +262,27 @@ class WorkSyncApp {
         } finally {
             this.showLoading(false);
         }
+    }
+
+    // Public helper to refresh stats using current managers without reinitializing charts unnecessarily
+    refreshDashboardFromManagers() {
+        const projects = (window.projectsManager && window.projectsManager.projects)
+            ? [...window.projectsManager.projects]
+            : [];
+        const tasks = (window.tasksManager && window.tasksManager.tasks)
+            ? [...window.tasksManager.tasks]
+            : [];
+
+        if (projects.length === 0 && tasks.length === 0) {
+            // If nothing loaded yet, fall back to full load which provides demo data
+            this.loadDashboard();
+            return;
+        }
+
+        this.updateDashboardStats(projects, tasks);
+        // For simplicity, recreate charts with the latest tasks
+        this.updateDashboardCharts(tasks);
+        this.updateRecentItems(projects, tasks);
     }
 
     updateDashboardStats(projects, tasks) {

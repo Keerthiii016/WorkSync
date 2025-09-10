@@ -329,6 +329,10 @@ class TasksManager {
         if (window.kanbanManager) {
             window.kanbanManager.refreshBoard();
         }
+        // Update dashboard stats after task changes
+        if (window.worksyncApp && typeof window.worksyncApp.refreshDashboardFromManagers === 'function') {
+            window.worksyncApp.refreshDashboardFromManagers();
+        }
     }
 
     editTask(taskId) {

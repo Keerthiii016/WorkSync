@@ -227,6 +227,10 @@ class ProjectsManager {
             form.reset();
 
             window.worksyncApp.showSuccess('Project created successfully');
+            // Refresh dashboard to reflect new project count
+            if (window.worksyncApp && typeof window.worksyncApp.refreshDashboardFromManagers === 'function') {
+                window.worksyncApp.refreshDashboardFromManagers();
+            }
         } catch (error) {
             console.error('Failed to create project:', error);
             window.worksyncApp.showError('Failed to create project');
@@ -339,6 +343,10 @@ class ProjectsManager {
             this.renderProjects();
             this.updateProjectFilters();
             window.worksyncApp.showSuccess('Project deleted successfully');
+            // Refresh dashboard to reflect updated project/task counts
+            if (window.worksyncApp && typeof window.worksyncApp.refreshDashboardFromManagers === 'function') {
+                window.worksyncApp.refreshDashboardFromManagers();
+            }
         } catch (error) {
             console.error('Failed to delete project:', error);
             window.worksyncApp.showError('Failed to delete project');
