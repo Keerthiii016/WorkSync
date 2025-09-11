@@ -206,7 +206,9 @@ class KanbanManager {
             task.status = newStatus;
             
             if (newStatus === 'COMPLETED') {
-                task.completedAt = new Date().toISOString().split('T')[0];
+                const todayIso = new Date().toISOString().split('T')[0];
+                // Prefer due date if set so weekly chart aligns with expected date
+                task.completedAt = task.dueDate || todayIso;
             } else {
                 task.completedAt = null;
             }
@@ -221,6 +223,10 @@ class KanbanManager {
             }
 
             window.worksyncApp.showSuccess(`Task moved from ${oldStatus.replace('_', ' ')} to ${newStatus.replace('_', ' ')}`);
+            // Refresh dashboard to reflect status change
+            if (window.worksyncApp && typeof window.worksyncApp.refreshDashboardFromManagers === 'function') {
+                window.worksyncApp.refreshDashboardFromManagers();
+            }
         }
     }
 

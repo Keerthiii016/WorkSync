@@ -357,23 +357,47 @@ class WorkSyncApp {
             this._weeklyProgressChart = null;
         }
 
+        // Helper: format local date to YYYY-MM-DD (no timezone shift)
+        const toLocalYMD = (d) => {
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
+        // Helper: normalize various date-like values to local YYYY-MM-DD
+        const normalizeToLocalYMD = (value) => {
+            if (!value) return null;
+            if (typeof value === 'string') {
+                // If already in YYYY-MM-DD, keep; if not, try to parse
+                if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+                const parsed = new Date(value);
+                return isNaN(parsed) ? null : toLocalYMD(parsed);
+            }
+            const d = value instanceof Date ? value : new Date(value);
+            return isNaN(d) ? null : toLocalYMD(d);
+        };
+
         const last7Days = Array.from({length: 7}, (_, i) => {
             const date = new Date();
             date.setDate(date.getDate() - i);
-            return date.toISOString().split('T')[0];
+            return toLocalYMD(date);
         }).reverse();
 
         const completedTasksByDay = last7Days.map(date => {
-            return tasks.filter(task => 
-                task.status === 'COMPLETED' && 
-                task.completedAt?.startsWith(date)
-            ).length;
+            return tasks.filter(task => {
+                if (task.status !== 'COMPLETED') return false;
+                // Prefer dueDate to represent when the work was effectively planned/done
+                const effectiveDate = normalizeToLocalYMD(task.dueDate || task.completedAt || task.createdAt);
+                if (!effectiveDate) return false;
+                return effectiveDate === date;
+            }).length;
         });
 
         this._weeklyProgressChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: last7Days.map(date => new Date(date).toLocaleDateString()),
+                labels: last7Days.map(date => new Date(date + 'T00:00:00').toLocaleDateString()),
                 datasets: [{
                     label: 'Completed Tasks',
                     data: completedTasksByDay,

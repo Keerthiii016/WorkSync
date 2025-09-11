@@ -267,7 +267,11 @@ class TasksManager {
                         project: project,
                         status: taskData.status,
                         priority: taskData.priority,
-                        dueDate: taskData.dueDate || null
+                        dueDate: taskData.dueDate || null,
+                        // Ensure completedAt is set when marking completed
+                        completedAt: taskData.status === 'COMPLETED' 
+                            ? (this.tasks[taskIndex].completedAt || new Date().toISOString().split('T')[0])
+                            : null
                     };
                     
                     this.filteredTasks = [...this.tasks];
@@ -303,6 +307,9 @@ class TasksManager {
                     priority: taskData.priority,
                     assignedTo: { id: 1, name: 'Demo User' },
                     dueDate: taskData.dueDate || null,
+                    completedAt: taskData.status === 'COMPLETED' 
+                        ? new Date().toISOString().split('T')[0] 
+                        : null,
                     createdAt: new Date().toISOString().split('T')[0]
                 };
 
@@ -368,11 +375,20 @@ class TasksManager {
             task.completedAt = null;
         } else {
             task.status = 'COMPLETED';
-            task.completedAt = new Date().toISOString().split('T')[0];
+            // Prefer the task's due date if provided; otherwise use today
+            const todayIso = new Date().toISOString().split('T')[0];
+            task.completedAt = task.dueDate || todayIso;
         }
 
         this.renderTasks();
         window.worksyncApp.showSuccess(`Task marked as ${task.status.toLowerCase()}`);
+        // Keep kanban and dashboard in sync
+        if (window.kanbanManager) {
+            window.kanbanManager.refreshBoard();
+        }
+        if (window.worksyncApp && typeof window.worksyncApp.refreshDashboardFromManagers === 'function') {
+            window.worksyncApp.refreshDashboardFromManagers();
+        }
     }
 
     deleteTask(taskId) {
